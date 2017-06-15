@@ -9,10 +9,6 @@ ARG TOOLCHAIN=stable
 # Make sure we have basic dev tools for building C libraries.  Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
 # large selection of the most popular crates.
-#
-# We also set up a `rust` user by default, in whose account we'll install
-# the Rust toolchain.  This user has sudo privileges if you need to install
-# any more software.
 RUN apt-get update && \
     apt-get install -y \
         build-essential \
@@ -23,10 +19,13 @@ RUN apt-get update && \
         musl-tools \
         sudo \
         xutils-dev \
-        linux-headers-generic \
+        linux-libc-dev \
         && \
     apt-get clean && rm -rf /var/lib/apt/lists/* 
 
+# We also set up a `rust` user by default, in whose account we'll install
+# the Rust toolchain.  This user has sudo privileges if you need to install
+# any more software.
 RUN useradd rust --user-group --create-home --shell /bin/bash --groups sudo 
 
 # Allow sudo without a password.
