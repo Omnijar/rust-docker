@@ -25,8 +25,9 @@ RUN apt-get update && \
         xutils-dev \
         linux-headers-generic \
         && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    useradd rust --user-group --create-home --shell /bin/bash --groups sudo \
+    apt-get clean && rm -rf /var/lib/apt/lists/* 
+
+RUN useradd rust --user-group --create-home --shell /bin/bash --groups sudo 
 
 # Allow sudo without a password.
 ADD sudoers /etc/sudoers.d/nopasswd
