@@ -23,6 +23,7 @@ RUN apt-get update && \
         musl-tools \
         sudo \
         xutils-dev \
+        linux-headers \
         && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     useradd rust --user-group --create-home --shell /bin/bash --groups sudo
