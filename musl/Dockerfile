@@ -25,7 +25,7 @@ RUN apt-get update && \
         xutils-dev \
         && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    useradd rust --user-group --create-home --shell /bin/bash --groups sudo \
+    useradd rust --user-group --create-home --shell /bin/bash --groups sudo && \
     cd /user/src/linux-headers-$(uname -r) && make scripts
 
 # Allow sudo without a password.
