@@ -27,8 +27,6 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     useradd rust --user-group --create-home --shell /bin/bash --groups sudo
 
-RUN pkexec chmod 755 /etc
-
 # Allow sudo without a password.
 ADD sudoers /etc/sudoers.d/nopasswd
 
