@@ -25,10 +25,7 @@ RUN apt-get update && \
         xutils-dev \
         && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
-    useradd rust --user-group --create-home --shell /bin/bash --groups sudo
-
-# Allow sudo without a password.
-ADD sudoers /etc/sudoers.d/nopasswd
+    useradd rust --user-group --create-home --shell /bin/bash --groups sudo && echo "rust:rust" | chpasswd && adduser rust sudo
 
 # Run all further code as user `rust`, and create our working directories
 # as the appropriate user.
