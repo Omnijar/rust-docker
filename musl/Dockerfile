@@ -1,3 +1,8 @@
+# Use Ubuntu 17.04 as the base for our Rust musl toolchain.
+FROM ubuntu:17.04
+
+MAINTAINER Phil J. Łaszkowicz <phil@fillip.pro>
+
 RUN apt-get update && apt-get install -y \
   cmake \
   curl \
