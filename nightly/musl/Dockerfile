@@ -36,7 +36,7 @@ RUN rustup target add x86_64-unknown-linux-musl \
     --toolchain nightly-x86_64-unknown-linux-gnu
 
 # make default target to musl
-RUN mkdir /.cargo && \
+RUN mkdir /.cargo
 ADD cargo-config.toml /.cargo/config
 
 # SSL cert directories get overridden by --prefix and --openssldir
