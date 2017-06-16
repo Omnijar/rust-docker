@@ -1,59 +1,51 @@
-# Use Ubuntu 17.04 as the base for our Rust musl toolchain.
-FROM ubuntu:17.04
+# Use Jessie as the base for our Rust musl toolchain.
+FROM debian:jessie
 
 MAINTAINER Phil J. Łaszkowicz <phil@fillip.pro>
 
 # The Rust toolchain to use when building our image.  Set by `hooks/build`.
 ARG TOOLCHAIN=stable
 
-RUN apt-get update && apt-get install -y \
-    cmake \
-    curl \
-    file \
-    git \
-    g++ \
-    python \
-    make \
-    nano \
-    ca-certificates \
-    xz-utils \
-    musl-tools \
-    pkg-config \
-    apt-file \
-    xutils-dev \
-    --no-install-recommends && \
+WORKDIR /root
+
+# common packages
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    ca-certificates curl file \
+    build-essential \
+    autoconf automake autotools-dev libtool xutils-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Install our Rust toolchain and the `musl` target.  We patch the
-# command-line we pass to the installer so that it won't attempt to
-# interact with the user or fool around with TTYs.  We also set the default
-# `--target` to musl so that our users don't need to keep overriding it
-# manually.
+ENV SSL_VERSION=1.1.0fk
+
+RUN curl https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz -O && \
+    tar -xzf openssl-$SSL_VERSION.tar.gz && \
+    cd openssl-$SSL_VERSION && ./config && make depend && make install && \
+    cd .. && rm -rf openssl-$SSL_VERSION*
+
+ENV OPENSSL_LIB_DIR=/usr/local/ssl/lib \
+    OPENSSL_INCLUDE_DIR=/usr/local/ssl/include \
+    OPENSSL_STATIC=1
+
+# install toolchain
 RUN curl https://sh.rustup.rs -sSf | \
-    sh -s -- -y --default-toolchain $TOOLCHAIN && \
-    rustup target add x86_64-unknown-linux-musl
-ADD cargo-config.toml /home/rust/.cargo/config
+    sh -s -- --default-toolchain stable -y
 
-# Compile C libraries with musl-gcc
-ENV SSL_VER=1.1.0f \
-    CURL_VER=7.54.0 \
-    CC=musl-gcc \
-    PREFIX=/usr/local \
-    PATH=/usr/local/bin:$PATH \
-    PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+ENV PATH=/root/.cargo/bin:$PATH
 
-RUN curl -sL http://www.openssl.org/source/openssl-$SSL_VER.tar.gz | tar xz && \
-    cd openssl-$SSL_VER && \
-    ./Configure no-shared --prefix=$PREFIX --openssldir=$PREFIX/ssl no-zlib linux-x86_64 -fPIC && \
-    make depend 2> /dev/null && make -j$(nproc) && make install && \
-    cd .. && rm -rf openssl-$SSL_VER
+# musl tools
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    musl-tools && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN curl https://curl.haxx.se/download/curl-$CURL_VER.tar.gz | tar xz && \
-    cd curl-$CURL_VER && \
-    ./configure --enable-shared=no --enable-static=ssl --enable-optimize --prefix=$PREFIX \
-      --with-ca-path=/etc/ssl/certs/ --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt --without-ca-fallback && \
-    make -j$(nproc) && make install && \
-    cd .. && rm -rf curl-$CURL_VER
+# install musl target
+RUN rustup target add x86_64-unknown-linux-musl \
+    --toolchain stable-x86_64-unknown-linux-gnu
+
+# make default target to musl
+RUN mkdir /.cargo && \
+echo "[build]\ntarget = \"x86_64-unknown-linux-musl\"" > /.cargo/config
 
 # SSL cert directories get overridden by --prefix and --openssldir
 # and they do not match the typical host configurations.
