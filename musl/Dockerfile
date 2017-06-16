@@ -3,34 +3,39 @@ FROM ubuntu:17.04
 
 MAINTAINER Phil J. Łaszkowicz <phil@fillip.pro>
 
-RUN apt-get update && apt-get install -y \
-  cmake \
-  curl \
-  file \
-  git \
-  g++ \
-  python \
-  make \
-  nano \
-  ca-certificates \
-  xz-utils \
-  musl-tools \
-  pkg-config \
-  apt-file \
-  xutils-dev \
-  --no-install-recommends && \
-  rm -rf /var/lib/apt/lists/*
+# The Rust toolchain to use when building our image.  Set by `hooks/build`.
+ARG TOOLCHAIN=stable
 
-RUN curl https://static.rust-lang.org/rustup.sh | sh -s -- \
-  --with-target=x86_64-unknown-linux-musl \
-  --yes \
-  --disable-sudo \
-  --channel=nightly && \
-  mkdir /.cargo && \
-  echo "[build]\ntarget = \"x86_64-unknown-linux-musl\"" > /.cargo/config
+RUN apt-get update && apt-get install -y \
+    cmake \
+    curl \
+    file \
+    git \
+    g++ \
+    python \
+    make \
+    nano \
+    ca-certificates \
+    xz-utils \
+    musl-tools \
+    pkg-config \
+    apt-file \
+    xutils-dev \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install our Rust toolchain and the `musl` target.  We patch the
+# command-line we pass to the installer so that it won't attempt to
+# interact with the user or fool around with TTYs.  We also set the default
+# `--target` to musl so that our users don't need to keep overriding it
+# manually.
+RUN curl https://sh.rustup.rs -sSf | \
+    sh -s -- -y --default-toolchain $TOOLCHAIN && \
+    rustup target add x86_64-unknown-linux-musl
+ADD cargo-config.toml /home/rust/.cargo/config
 
 # Compile C libraries with musl-gcc
-ENV SSL_VER=1.0.2k \
+ENV SSL_VER=1.1.0f \
     CURL_VER=7.54.0 \
     CC=musl-gcc \
     PREFIX=/usr/local \
