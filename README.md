@@ -4,8 +4,8 @@
 
 Public trusted images available on:
 
-* [Docker Hub](https://hub.docker.com/r/jimmycuadra/rust/)
-* [Quay.io](https://quay.io/repository/jimmycuadra/rust)
+* [Docker Hub](https://hub.docker.com/r/omnijarstudio/rust/)
+* [Quay.io](https://quay.io/repository/omnijarstudio/rust)
 
 This repository is used to build a Docker image for the 
 Rust programming language and a few supporting tools. The 
@@ -64,7 +64,7 @@ installed, you can create a Dockerfile based on this one, and use
 `musl-gcc` to compile the libraries you need.  For example:
 
 ```Dockerfile
-FROM ekidd/rust-musl-builder
+FROM omnijarstudio/rust:musl
 
 RUN VERS=1.2.8 && \
     cd /home/rust/libs && \
