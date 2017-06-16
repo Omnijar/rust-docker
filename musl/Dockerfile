@@ -16,7 +16,7 @@ RUN apt-get update && \
     autoconf automake autotools-dev libtool xutils-dev && \
     rm -rf /var/lib/apt/lists/*
 
-ENV SSL_VERSION=1.1.0fk
+ENV SSL_VERSION=1.1.0f
 
 RUN curl https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz -O && \
     tar -xzf openssl-$SSL_VERSION.tar.gz && \
