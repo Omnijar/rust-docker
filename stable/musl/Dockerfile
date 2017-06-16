@@ -23,10 +23,6 @@ RUN curl https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz -O && \
     cd openssl-$SSL_VERSION && ./config && make depend && make install && \
     cd .. && rm -rf openssl-$SSL_VERSION*
 
-ENV OPENSSL_LIB_DIR=/usr/local/ssl/lib \
-    OPENSSL_INCLUDE_DIR=/usr/local/ssl/include \
-    OPENSSL_STATIC=1
-
 # install toolchain
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- --default-toolchain stable -y
@@ -45,7 +41,7 @@ RUN rustup target add x86_64-unknown-linux-musl \
 
 # make default target to musl
 RUN mkdir /.cargo && \
-echo "[build]\ntarget = \"x86_64-unknown-linux-musl\"" > /.cargo/config
+ADD cargo-config.toml /.cargo/config
 
 # SSL cert directories get overridden by --prefix and --openssldir
 # and they do not match the typical host configurations.
