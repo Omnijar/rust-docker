@@ -11,8 +11,8 @@ This repository is used to build a Docker image for the
 Rust programming language and a few supporting tools. The 
 image includes `rustc`, `rustdoc`, `cargo`, `git`, SSL 
 certificates, and build essentials, so it should be able 
-to run `cargo build` on most projects out of the box. T
-he path `/source` is a volume where you can mount a 
+to run `cargo build` on most projects out of the box. 
+The path `/root` is a volume where you can mount a 
 Cargo project from the host machine.
 
 ### Usage
@@ -22,7 +22,7 @@ current directory on the host shared. From there you can run
 `rustc`, `rustdoc`, and `cargo` as you please.
 
 ``` bash
-docker run -it --rm -v $(pwd):/source omnijarstudio/rust
+docker run -it --rm -v $(pwd):/root omnijarstudio/rust
 ```
 
 ## Building for musl
@@ -30,8 +30,8 @@ docker run -it --rm -v $(pwd):/source omnijarstudio/rust
 ### Without dependencies
 
 ```sh
-alias rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src omnijarstudio/rust'
-omnijar-rust cargo build --release
+alias omnijar-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src omnijarstudio/rust:linux-musl'
+omnijar-musl-builder cargo build --release
 ```
 
 This command assumes that `$(pwd)` is readable and writable by uid 1000,
@@ -44,7 +44,7 @@ making final release builds.
 
 With a bit of luck, you should be able to just copy your application binary
 from `target/x86_64-unknown-linux-musl/release`, and install it directly on
-any reasonably modern x86_64 Linux machine.  In particular, you should be
+any reasonably modern x86_64 Linux machine. In particular, you should be
 able to copy your Rust application into an
 [Alpine Linux container][].
 
@@ -64,7 +64,7 @@ installed, you can create a Dockerfile based on this one, and use
 `musl-gcc` to compile the libraries you need.  For example:
 
 ```Dockerfile
-FROM omnijarstudio/rust:musl
+FROM omnijarstudio/rust:linux-musl
 
 RUN VERS=1.2.8 && \
     cd /home/rust/libs && \

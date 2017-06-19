@@ -1,0 +1,3 @@
+[build]
+# Target glib by default when running Cargo.
+target = "x86_64-unknown-linux-gnu"
