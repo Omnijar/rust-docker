@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM ubuntu:16.04
 
 MAINTAINER Phil J. Łaszkowicz <phil@fillip.pro>
 
@@ -15,7 +15,8 @@ RUN apt-get update && \
     curl \
     file \
     libtool \
-    xutils-dev 
+    musl-tools \
+    xutils-dev
 
 # set openssl version
 ENV SSL_VERSION=1.0.2l
@@ -24,9 +25,9 @@ ENV SSL_VERSION=1.0.2l
 RUN curl https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz -O && \
     tar -xzf openssl-$SSL_VERSION.tar.gz && \
     cd openssl-$SSL_VERSION && \
-       ./config && \
-       make depend && \
-       make install && \
+    env CC=musl-gcc ./config && \
+    make depend && \
+    make install && \
     cd .. && rm -rf openssl-$SSL_VERSION*
 
 ENV OPENSSL_LIB_DIR=/usr/local/ssl/lib \
@@ -39,11 +40,6 @@ RUN curl https://sh.rustup.rs -sSf | \
 
 # set cargo path
 ENV PATH=/root/.cargo/bin:$PATH
-
-# musl tools
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y \
-    musl-tools 
 
 # install musl target
 RUN rustup target add x86_64-unknown-linux-musl && \
