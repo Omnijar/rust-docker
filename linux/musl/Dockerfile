@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM ubuntu:16.04
 
 MAINTAINER Phil J. Łaszkowicz <phil@fillip.pro>
 
@@ -41,7 +41,9 @@ ENV PATH=/home/rust/.cargo/bin:/usr/local/musl/bin:/usr/local/bin:/usr/bin:/bin
 # manually.
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- -y --default-toolchain $TOOLCHAIN && \
-    rustup target add x86_64-unknown-linux-musl
+    rustup target add x86_64-unknown-linux-musl && \
+    rustup target add i686-unknown-linux-musl \
+    --toolchain $TOOLCHAIN-x86_64-unknown-linux-gnu
 ADD cargo-config.toml /home/rust/.cargo/config
 
 # We'll build our libraries in subdirectories of /home/rust/libs.  Please
@@ -56,8 +58,10 @@ ENV SSL_VERSION=1.0.2l
 RUN curl -O https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz && \
     tar xvzf openssl-$SSL_VERSION.tar.gz && cd openssl-$SSL_VERSION && \
     env CC=musl-gcc ./config --prefix=/usr/local/musl && \
-    env C_INCLUDE_PATH=/usr/local/musl/include/ make depend && \
-    make && sudo make install && \
+    env C_INCLUDE_PATH=/usr/local/musl/include/ && \
+    make depend && \
+    make && \
+    sudo make install && \
     cd .. && rm -rf openssl-$SSL_VERSION.tar.gz openssl-$SSL_VERSION
 
 ENV OPENSSL_DIR=/usr/local/musl/ \
