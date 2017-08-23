@@ -1,4 +1,4 @@
-FROM omnijarstudio/rust
+FROM debian:stretch
 
 MAINTAINER Phil J. Łaszkowicz <phil@fillip.pro>
 

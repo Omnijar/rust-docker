@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM debian:stretch
 
 MAINTAINER Phil J. Łaszkowicz <phil@fillip.pro>
 
@@ -62,7 +62,8 @@ RUN curl -O https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz && \
     make depend && \
     make && \
     sudo make install && \
-    cd .. && rm -rf openssl-$SSL_VERSION.tar.gz openssl-$SSL_VERSION
+    cd .. && \
+    rm -rf openssl-$SSL_VERSION.tar.gz openssl-$SSL_VERSION
 
 ENV OPENSSL_DIR=/usr/local/musl/ \
     OPENSSL_INCLUDE_DIR=/usr/local/musl/include/ \
