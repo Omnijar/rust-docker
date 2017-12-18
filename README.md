@@ -1,11 +1,12 @@
 # Rust Docker container for easily building static Rust binaries
 
+[![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)]()
+[![Linux](https://img.shields.io/badge/os-linux-green.svg?style=flat)]()
+[![Windows](https://img.shields.io/badge/os-windows-green.svg?style=flat)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](https://opensource.org/licenses/MIT)
 [![Docker Image](https://img.shields.io/docker/pulls/omnijarstudio/rust.svg?maxAge=2592000)](https://hub.docker.com/r/omnijarstudio/rust/)
-
-Public trusted images available on:
-
-* [Docker Hub](https://hub.docker.com/r/omnijarstudio/rust/)
-* [Quay.io](https://quay.io/repository/omnijarstudio/rust)
+[![Quay.io](https://quay.io/repository/omnijar/rust/status "Quay.io")](https://quay.io/repository/omnijar/rust)
+[![Twitter: @siilime](https://img.shields.io/badge/contact-@siilime-blue.svg?style=flat)](https://twitter.com/OmnijarStudio)
 
 This repository is used to build a Docker image for the 
 Rust programming language and a few supporting tools. The 
@@ -22,7 +23,7 @@ current directory on the host shared. From there you can run
 `rustc`, `rustdoc`, and `cargo` as you please.
 
 ``` bash
-docker run -it --rm -v $(pwd):/root omnijarstudio/rust
+docker run -it --rm -v $(pwd):/root omnijar/rust
 ```
 
 ## Building for musl
@@ -30,7 +31,7 @@ docker run -it --rm -v $(pwd):/root omnijarstudio/rust
 ### Without dependencies
 
 ```sh
-alias omnijar-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src omnijarstudio/rust:linux-musl'
+alias omnijar-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src omnijar/rust:linux-musl'
 omnijar-musl-builder cargo build --release
 ```
 
@@ -42,8 +43,8 @@ making final release builds.
 
 ### Deploying your Rust application
 
-With a bit of luck, you should be able to just copy your application binary
-from `target/x86_64-unknown-linux-musl/release`, and install it directly on
+You should be able to just copy your application binary from 
+`target/x86_64-unknown-linux-musl/release`, and install it directly on
 any reasonably modern x86_64 Linux machine. In particular, you should be
 able to copy your Rust application into an
 [Alpine Linux container][].
@@ -55,7 +56,7 @@ able to copy your Rust application into an
 libraries:
 
 - The standard `musl-libc` libraries.
-- OpenSSL, which is needed by many Rust applications.
+- OpenSSL, which is needed by many Rust applications, and requires specific considerables under macOS.
 
 ### Adding more C libraries
 
@@ -64,9 +65,9 @@ installed, you can create a Dockerfile based on this one, and use
 `musl-gcc` to compile the libraries you need.  For example:
 
 ```Dockerfile
-FROM omnijarstudio/rust:linux-musl
+FROM omnijar/rust:linux-musl
 
-RUN VERS=1.2.8 && \
+RUN VERS=1.2.11 && \
     cd /home/rust/libs && \
     curl -LO http://zlib.net/zlib-$VERS.tar.gz && \
     tar xzf zlib-$VERS.tar.gz && cd zlib-$VERS && \
