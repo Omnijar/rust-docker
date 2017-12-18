@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](https://opensource.org/licenses/MIT)
 [![Docker Image](https://img.shields.io/docker/pulls/omnijar/rust.svg?maxAge=2592000)](https://hub.docker.com/r/omnijar/rust/)
 [![Quay.io](https://quay.io/repository/omnijar/rust/status "Quay.io")](https://quay.io/repository/omnijar/rust)
-[![Twitter: @siilime](https://img.shields.io/badge/contact-@siilime-blue.svg?style=flat)](https://twitter.com/OmnijarStudio)
+[![Twitter: @siilime](https://img.shields.io/badge/contact-@OmnijarStudio-blue.svg?style=flat)](https://twitter.com/OmnijarStudio)
 
 This repository is used to build a Docker image for the 
 Rust programming language and a few supporting tools. The 
