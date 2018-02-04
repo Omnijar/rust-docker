@@ -2,7 +2,7 @@ FROM debian:stretch
 
 MAINTAINER Phil J. Łaszkowicz <phil@fillip.pro>
 
-# The Rust toolchain to use when building our image.  Set by `hooks/build`.
+# The Rust toolchain to use when building our image.  Set by `--build-arg`.
 ARG TOOLCHAIN=stable
 
 # build packages
@@ -18,12 +18,13 @@ RUN apt-get update && \
     libtool \
     musl-tools \
     sudo \
-    xutils-dev 
+    xutils-dev
 
 RUN useradd rust --user-group --create-home --shell /bin/bash --groups sudo
 
 # Allow sudo without a password.
 ADD linux/musl/sudoers /etc/sudoers.d/nopasswd
+RUN chmod -R 0755 /etc/sudoers.d
 
 # Run all further code as user `rust`, and create our working directories
 # as the appropriate user.
@@ -61,7 +62,7 @@ WORKDIR /home/rust/libs
 ENV SSL_VERSION=1.0.2l
 
 # Build a static library version of OpenSSL using musl-libc.  This is
-# needed by the popular Rust `hyper` crate.
+# needed by the popular `rust-openssl` crate.
 RUN curl -O https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz && \
     tar xvzf openssl-$SSL_VERSION.tar.gz && cd openssl-$SSL_VERSION && \
     env CC=musl-gcc ./config --prefix=/usr/local/musl && \
