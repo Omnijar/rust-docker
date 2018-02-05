@@ -5,7 +5,7 @@ variables:
   CONTAINER_RELEASE_IMAGE: $CONTAINER_IMAGE:latest #$CI_REGISTRY_IMAGE:latest
  
 stages:
-  - build
+  - deploy
   
 image: docker:latest
 
