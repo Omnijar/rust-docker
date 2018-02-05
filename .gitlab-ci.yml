@@ -13,12 +13,11 @@ services:
   - docker:dind
 
 before_script:
-  - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD" $DOCKER_REGISTRY
+  - echo -n $DOCKER_HUB_SECRET | docker login -u $DOCKER_HUB_USERNAME --password-stdin
 
 build:container:
   stage: deploy
   script:
-    - echo -n $DOCKER_HUB_SECRET | docker login -u $DOCKER_HUB_USERNAME --password-stdin
     - docker build --pull -t $CONTAINER_TEST_IMAGE -f Dockerfile .
     - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
     - docker push $CONTAINER_RELEASE_IMAGE
@@ -31,7 +30,6 @@ build:container:
 tag:container:
   stage: deploy
   script:
-    - echo -n $DOCKER_HUB_SECRET | docker login -u $DOCKER_HUB_USERNAME --password-stdin
     - docker build --pull -t $CONTAINER_TEST_IMAGE -f Dockerfile .
     - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_IMAGE:$CI_BUILD_REF_NAME
     - docker push $CONTAINER_IMAGE:$CI_BUILD_REF_NAME
@@ -44,7 +42,6 @@ tag:container:
 nightly:container:
   stage: deploy
   script:
-    - echo -n $DOCKER_HUB_SECRET | docker login -u $DOCKER_HUB_USERNAME --password-stdin
     - docker build --pull -t $CONTAINER_TEST_IMAGE -f Dockerfile .
     - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_IMAGE:nightly
     - docker push $CONTAINER_IMAGE:nightly
