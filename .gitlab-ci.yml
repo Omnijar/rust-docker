@@ -5,6 +5,7 @@ variables:
   CONTAINER_RELEASE_IMAGE: $CONTAINER_IMAGE:latest #$CI_REGISTRY_IMAGE:latest
  
 stages:
+  - test
   - deploy
   
 image: docker:latest
@@ -14,6 +15,17 @@ services:
 
 before_script:
   - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD" $DOCKER_REGISTRY
+
+build:container:
+  stage: test
+  script:
+    - echo -n $DOCKER_HUB_SECRET | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+    - docker build --pull -t $CONTAINER_TEST_IMAGE -f Dockerfile .
+    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
+  tags:
+    - docker
+  only: 
+    - branches
 
 build:container:
   stage: deploy
