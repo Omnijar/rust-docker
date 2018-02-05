@@ -2,7 +2,7 @@ FROM debian:stretch
 
 MAINTAINER Phil J. Łaszkowicz <phil@fillip.pro>
 
-# The Rust toolchain to use when building our image.  Set by `hooks/build`.
+# The Rust toolchain to use when building our image.  Set by `--build-arg`.
 ARG TOOLCHAIN=stable
 
 # build packages
@@ -18,12 +18,13 @@ RUN apt-get update && \
     libtool \
     musl-tools \
     sudo \
-    xutils-dev 
+    xutils-dev
 
 RUN useradd rust --user-group --create-home --shell /bin/bash --groups sudo
 
 # Allow sudo without a password.
 ADD sudoers /etc/sudoers.d/nopasswd
+RUN chmod -R 0755 /etc/sudoers.d
 
 # Run all further code as user `rust`, and create our working directories
 # as the appropriate user.

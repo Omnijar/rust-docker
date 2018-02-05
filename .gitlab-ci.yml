@@ -1,3 +1,12 @@
+variables:
+  DOCKER_DRIVER: overlay
+  CONTAINER_IMAGE: omnijar/rust #$CI_REGISTRY_IMAGE
+  CONTAINER_TEST_IMAGE: $CONTAINER_IMAGE:$CI_BUILD_REF_NAME #$CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+  CONTAINER_RELEASE_IMAGE: $CONTAINER_IMAGE:latest #$CI_REGISTRY_IMAGE:latest
+ 
+stages:
+  - deploy
+  
 image: docker:latest
 
 services:
@@ -6,19 +15,42 @@ services:
 before_script:
   - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD" $DOCKER_REGISTRY
 
-build-master:
-  stage: build
+build:container:
+  stage: deploy
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
-    - docker push "$CI_REGISTRY_IMAGE"
-  only:
-    - master
+    - echo -n $DOCKER_HUB_SECRET | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+    - docker build --pull -t $CONTAINER_TEST_IMAGE -f Dockerfile .
+    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
+    - docker push $CONTAINER_RELEASE_IMAGE
+  when: manual
+  tags:
+    - docker
+  only: 
+    - release
+    
+tag:container:
+  stage: deploy
+  script:
+    - echo -n $DOCKER_HUB_SECRET | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+    - docker build --pull -t $CONTAINER_TEST_IMAGE -f Dockerfile .
+    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_IMAGE:$CI_BUILD_REF_NAME
+    - docker push $CONTAINER_IMAGE:$CI_BUILD_REF_NAME
+  when: manual
+  tags:
+    - docker
+  only: 
+    - tags
 
-build:
-  stage: build
+nightly:container:
+  stage: deploy
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-  except:
-    - master
+    - echo -n $DOCKER_HUB_SECRET | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+    - docker build --pull -t $CONTAINER_TEST_IMAGE -f Dockerfile .
+    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_IMAGE:nightly
+    - docker push $CONTAINER_IMAGE:nightly
+  when: on_success
+  tags:
+    - docker
+  only:
+    - schedules
 
